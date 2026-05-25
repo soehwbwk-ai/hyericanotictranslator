@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>임시 웹사이트</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Pretendard", sans-serif;
+    }
+
+    body {
+      background: #f4f4f4;
+      color: #222;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 배너 */
+    .banner {
+      width: 100%;
+      background: #1f2937;
+      color: white;
+      padding: 20px;
+      font-size: 28px;
+      font-weight: bold;
+      text-align: center;
+      border-bottom: 2px solid #111827;
+    }
+
+    /* 메인 */
+    .container {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* 왼쪽 공지 목록 */
+    .sidebar {
+      width: 300px;
+      background: white;
+      border-right: 1px solid #ddd;
+      overflow-y: auto;
+    }
+
+    .sidebar-title {
+      padding: 18px;
+      font-size: 20px;
+      font-weight: bold;
+      border-bottom: 1px solid #eee;
+      background: #fafafa;
+    }
+
+    .notice-item {
+      padding: 16px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .notice-item:hover {
+      background: #f0f0f0;
+    }
+
+    .notice-item.active {
+      background: #e5edff;
+      font-weight: bold;
+    }
+
+    /* 오른쪽 내용 */
+    .content {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 20px;
+    }
+
+    select {
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .notice-title {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .notice-content {
+      font-size: 18px;
+      line-height: 1.8;
+      white-space: pre-wrap;
+    }
+
+    .empty {
+      color: #777;
+      font-size: 18px;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 배너 -->
+  <div class="banner">
+    임시 웹사이트
+  </div>
+
+  <div class="container">
+
+    <!-- 왼쪽 공지 목록 -->
+    <div class="sidebar">
+      <div class="sidebar-title">공지 목록</div>
+
+      <div class="notice-item active" onclick="loadNotice(0, this)">
+        테스트
+      </div>
+    </div>
+
+    <!-- 오른쪽 공지 표시 -->
+    <div class="content">
+
+      <div class="top-bar">
+        <select id="languageSelect" onchange="translateNotice()">
+          <option value="ko">한국어</option>
+          <option value="en">English</option>
+          <option value="ja">日本語</option>
+          <option value="zh">中文</option>
+        </select>
+      </div>
+
+      <div id="noticeArea">
+        <div class="notice-title" id="noticeTitle">테스트</div>
+        <div class="notice-content" id="noticeContent">
+번역 테스트, 표시 테스트
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // 공지 데이터
+    const notices = [
+      {
+        title: "테스트",
+        content: "번역 테스트, 표시 테스트"
+      }
+    ];
+
+    let currentNoticeIndex = 0;
+
+    // 테스트용 번역 데이터
+    const translations = {
+      ko: {
+        title: "테스트",
+        content: "번역 테스트, 표시 테스트"
+      },
+      en: {
+        title: "Test",
+        content: "Translation test, display test"
+      },
+      ja: {
+        title: "テスト",
+        content: "翻訳テスト、表示テスト"
+      },
+      zh: {
+        title: "测试",
+        content: "翻译测试，显示测试"
+      }
+    };
+
+    // 공지 불러오기
+    function loadNotice(index, element) {
+      currentNoticeIndex = index;
+
+      document.querySelectorAll(".notice-item").forEach(item => {
+        item.classList.remove("active");
+      });
+
+      element.classList.add("active");
+
+      translateNotice();
+    }
+
+    // 번역 기능
+    function translateNotice() {
+      const lang = document.getElementById("languageSelect").value;
+
+      document.getElementById("noticeTitle").innerText =
+        translations[lang].title;
+
+      document.getElementById("noticeContent").innerText =
+        translations[lang].content;
+    }
+  </script>
+
+</body>
+</html>
