@@ -21,7 +21,6 @@
       flex-direction: column;
     }
 
-    /* 배너 */
     .banner {
       width: 100%;
       background: #1f2937;
@@ -33,14 +32,12 @@
       border-bottom: 2px solid #111827;
     }
 
-    /* 메인 */
     .container {
       flex: 1;
       display: flex;
       overflow: hidden;
     }
 
-    /* 왼쪽 공지 목록 */
     .sidebar {
       width: 300px;
       background: white;
@@ -72,26 +69,18 @@
       font-weight: bold;
     }
 
-    /* 오른쪽 내용 */
     .content {
       flex: 1;
       padding: 30px;
       overflow-y: auto;
-      position: relative;
+      background: #f9fafb;
     }
 
     .top-bar {
       display: flex;
       justify-content: flex-end;
       margin-bottom: 20px;
-    }
-
-    select {
-      padding: 8px 12px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 14px;
-      cursor: pointer;
+      gap: 10px;
     }
 
     .notice-title {
@@ -103,51 +92,99 @@
     .notice-content {
       font-size: 18px;
       line-height: 1.8;
-      white-space: pre-wrap;
     }
 
-    .empty {
-      color: #777;
-      font-size: 18px;
-      margin-top: 40px;
+    .notice-content img {
+      max-width: 100%;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+
+    .notice-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: white;
+    }
+
+    .notice-content th,
+    .notice-content td {
+      border: 1px solid #ccc;
+      padding: 12px;
+      text-align: left;
+    }
+
+    .notice-content th {
+      background: #f3f4f6;
+    }
+
+    .notice-content ul {
+      margin-left: 20px;
+      margin-top: 10px;
+    }
+
+    .notice-content a {
+      color: #2563eb;
+      text-decoration: none;
+    }
+
+    .notice-content a:hover {
+      text-decoration: underline;
+    }
+
+    /* 구글 번역 기본 UI 숨기기 */
+    .goog-te-banner-frame.skiptranslate {
+      display: none !important;
+    }
+
+    body {
+      top: 0px !important;
+    }
+
+    .goog-logo-link,
+    .goog-te-gadget span {
+      display: none !important;
+    }
+
+    .goog-te-gadget {
+      font-size: 0;
     }
   </style>
 </head>
 <body>
 
-  <!-- 배너 -->
   <div class="banner">
     임시 웹사이트
   </div>
 
   <div class="container">
 
-    <!-- 왼쪽 공지 목록 -->
+    <!-- 공지 목록 -->
     <div class="sidebar">
       <div class="sidebar-title">공지 목록</div>
 
       <div class="notice-item active" onclick="loadNotice(0, this)">
-        테스트
+        테스트 공지
+      </div>
+
+      <div class="notice-item" onclick="loadNotice(1, this)">
+        업데이트 안내
       </div>
     </div>
 
-    <!-- 오른쪽 공지 표시 -->
+    <!-- 내용 -->
     <div class="content">
 
       <div class="top-bar">
-        <select id="languageSelect" onchange="translateNotice()">
-          <option value="ko">한국어</option>
-          <option value="en">English</option>
-          <option value="ja">日本語</option>
-          <option value="zh">中文</option>
-        </select>
+
+        <!-- 번역기 -->
+        <div id="google_translate_element"></div>
+
       </div>
 
       <div id="noticeArea">
-        <div class="notice-title" id="noticeTitle">테스트</div>
-        <div class="notice-content" id="noticeContent">
-번역 테스트, 표시 테스트
-        </div>
+        <div class="notice-title" id="noticeTitle"></div>
+        <div class="notice-content" id="noticeContent"></div>
       </div>
 
     </div>
@@ -157,34 +194,76 @@
     // 공지 데이터
     const notices = [
       {
-        title: "테스트",
-        content: "번역 테스트, 표시 테스트"
+        title: "테스트 공지",
+        content: `
+          <p>자동 번역 테스트입니다.</p>
+
+          <img src="https://picsum.photos/800/300">
+
+          <table>
+            <tr>
+              <th>날짜</th>
+              <th>내용</th>
+            </tr>
+
+            <tr>
+              <td>2026-05-26</td>
+              <td>자동 번역 기능 추가</td>
+            </tr>
+
+            <tr>
+              <td>2026-05-27</td>
+              <td>HTML 표 기능 추가</td>
+            </tr>
+          </table>
+
+          <br>
+
+          <b>지원 기능</b>
+
+          <ul>
+            <li>표 삽입</li>
+            <li>이미지 삽입</li>
+            <li>링크 삽입</li>
+            <li>자동 번역</li>
+          </ul>
+
+          <br>
+
+          <a href="https://github.com" target="_blank">
+            GitHub 바로가기
+          </a>
+        `
+      },
+
+      {
+        title: "업데이트 안내",
+        content: `
+          <p>업데이트 내역입니다.</p>
+
+          <table>
+            <tr>
+              <th>버전</th>
+              <th>변경사항</th>
+            </tr>
+
+            <tr>
+              <td>1.0</td>
+              <td>사이트 생성</td>
+            </tr>
+
+            <tr>
+              <td>1.1</td>
+              <td>자동 번역 기능 추가</td>
+            </tr>
+          </table>
+        `
       }
     ];
 
     let currentNoticeIndex = 0;
 
-    // 테스트용 번역 데이터
-    const translations = {
-      ko: {
-        title: "테스트",
-        content: "번역 테스트, 표시 테스트"
-      },
-      en: {
-        title: "Test",
-        content: "Translation test, display test"
-      },
-      ja: {
-        title: "テスト",
-        content: "翻訳テスト、表示テスト"
-      },
-      zh: {
-        title: "测试",
-        content: "翻译测试，显示测试"
-      }
-    };
-
-    // 공지 불러오기
+    // 공지 로딩
     function loadNotice(index, element) {
       currentNoticeIndex = index;
 
@@ -194,20 +273,33 @@
 
       element.classList.add("active");
 
-      translateNotice();
+      const notice = notices[index];
+
+      document.getElementById("noticeTitle").innerHTML =
+        notice.title;
+
+      document.getElementById("noticeContent").innerHTML =
+        notice.content;
     }
 
-    // 번역 기능
-    function translateNotice() {
-      const lang = document.getElementById("languageSelect").value;
+    // 첫 로딩
+    loadNotice(
+      0,
+      document.querySelector(".notice-item")
+    );
 
-      document.getElementById("noticeTitle").innerText =
-        translations[lang].title;
-
-      document.getElementById("noticeContent").innerText =
-        translations[lang].content;
+    // 구글 번역
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'ko',
+        includedLanguages: 'en,ja,zh-CN,ko',
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+      }, 'google_translate_element');
     }
   </script>
+
+  <!-- 구글 번역 API -->
+  <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 </body>
 </html>
