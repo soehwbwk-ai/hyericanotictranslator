@@ -2,276 +2,552 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>임시 웹사이트</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ERICA 공지사항</title>
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: "Pretendard", sans-serif;
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:"Pretendard", sans-serif;
     }
 
-    body {
-      background: #f4f4f4;
-      color: #222;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
+    body{
+      background:#f4f4f4;
+      color:#222;
+      height:100vh;
+      display:flex;
+      flex-direction:column;
     }
 
-    .banner {
-      width: 100%;
-      background: #1f2937;
-      color: white;
-      padding: 20px;
-      font-size: 28px;
-      font-weight: bold;
-      text-align: center;
-      border-bottom: 2px solid #111827;
+    /* 상단 배너 */
+
+    .banner{
+      width:100%;
+      background:#1f2937;
+      color:white;
+      padding:20px;
+      font-size:28px;
+      font-weight:bold;
+      text-align:center;
+      border-bottom:2px solid #111827;
     }
 
-    .container {
-      flex: 1;
-      display: flex;
-      overflow: hidden;
+    /* 메인 */
+
+    .container{
+      flex:1;
+      display:flex;
+      overflow:hidden;
     }
 
-    .sidebar {
-      width: 300px;
-      background: white;
-      border-right: 1px solid #ddd;
-      overflow-y: auto;
+    /* 좌측 */
+
+    .sidebar{
+      width:320px;
+      background:white;
+      border-right:1px solid #ddd;
+      overflow-y:auto;
     }
 
-    .sidebar-title {
-      padding: 18px;
-      font-size: 20px;
-      font-weight: bold;
-      border-bottom: 1px solid #eee;
-      background: #fafafa;
+    .sidebar-title{
+      padding:18px;
+      font-size:20px;
+      font-weight:bold;
+      border-bottom:1px solid #eee;
+      background:#fafafa;
+      position:sticky;
+      top:0;
+      z-index:10;
     }
 
-    .notice-item {
-      padding: 16px;
-      border-bottom: 1px solid #eee;
-      cursor: pointer;
-      transition: 0.2s;
+    .notice-item{
+      padding:16px;
+      border-bottom:1px solid #eee;
+      cursor:pointer;
+      transition:0.2s;
+      line-height:1.5;
     }
 
-    .notice-item:hover {
-      background: #f0f0f0;
+    .notice-item:hover{
+      background:#f0f0f0;
     }
 
-    .notice-item.active {
-      background: #e5edff;
-      font-weight: bold;
+    .notice-item.active{
+      background:#e5edff;
+      font-weight:bold;
     }
 
-    .content {
-      flex: 1;
-      padding: 30px;
-      overflow-y: auto;
-      background: #f9fafb;
+    /* 우측 */
+
+    .content{
+      flex:1;
+      padding:30px;
+      overflow-y:auto;
+      background:#f9fafb;
     }
 
-    .top-bar {
-      display: flex;
-      justify-content: flex-end;
-      margin-bottom: 20px;
-      gap: 10px;
+    .top-bar{
+      display:flex;
+      justify-content:flex-end;
+      margin-bottom:20px;
     }
 
-    .notice-title {
-      font-size: 32px;
-      font-weight: bold;
-      margin-bottom: 20px;
+    /* 언어 선택 */
+
+    #languageSwitcher{
+      padding:10px 14px;
+      border:1px solid #ccc;
+      border-radius:10px;
+      background:white;
+      font-size:15px;
+      cursor:pointer;
     }
 
-    .notice-content {
-      font-size: 18px;
-      line-height: 1.8;
+    .notice-title{
+      font-size:34px;
+      font-weight:bold;
+      margin-bottom:25px;
+      line-height:1.4;
     }
 
-    .notice-content img {
-      max-width: 100%;
-      border-radius: 12px;
-      margin: 20px 0;
+    .notice-content{
+      font-size:17px;
+      line-height:1.9;
+      word-break:keep-all;
     }
 
-    .notice-content table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      background: white;
+    /* 표 */
+
+    .notice-content table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:20px;
+      background:white;
     }
 
     .notice-content th,
-    .notice-content td {
-      border: 1px solid #ccc;
-      padding: 12px;
-      text-align: left;
+    .notice-content td{
+      border:1px solid #ccc;
+      padding:12px;
+      text-align:left;
+      vertical-align:top;
     }
 
-    .notice-content th {
-      background: #f3f4f6;
+    .notice-content th{
+      background:#f3f4f6;
+      width:220px;
     }
 
-    .notice-content ul {
-      margin-left: 20px;
-      margin-top: 10px;
+    /* 리스트 */
+
+    .notice-content ul{
+      margin-left:20px;
+      margin-top:10px;
     }
 
-    .notice-content a {
-      color: #2563eb;
-      text-decoration: none;
+    .notice-content li{
+      margin-bottom:8px;
     }
 
-    .notice-content a:hover {
-      text-decoration: underline;
+    /* 링크 */
+
+    .notice-content a{
+      color:#2563eb;
+      text-decoration:none;
+      font-weight:600;
     }
 
-    /* 구글 번역 기본 UI 숨기기 */
-    .goog-te-banner-frame.skiptranslate {
-      display: none !important;
+    .notice-content a:hover{
+      text-decoration:underline;
     }
 
-    body {
-      top: 0px !important;
+    /* 제목 */
+
+    .notice-content h2{
+      margin-top:10px;
+      margin-bottom:15px;
+      font-size:28px;
+    }
+
+    .notice-content h3{
+      margin-top:25px;
+      margin-bottom:10px;
+      font-size:22px;
+    }
+
+    /* 이미지 */
+
+    .notice-content img{
+      max-width:100%;
+      border-radius:12px;
+      margin:20px 0;
+    }
+
+    /* 구글 번역 UI 제거 */
+
+    .goog-te-banner-frame.skiptranslate{
+      display:none !important;
+    }
+
+    body{
+      top:0 !important;
     }
 
     .goog-logo-link,
-    .goog-te-gadget span {
-      display: none !important;
+    .goog-te-gadget span{
+      display:none !important;
     }
 
-    .goog-te-gadget {
-      font-size: 0;
+    .goog-te-gadget{
+      font-size:0;
     }
+
+    /* 모바일 */
+
+    @media(max-width:900px){
+
+      .container{
+        flex-direction:column;
+      }
+
+      .sidebar{
+        width:100%;
+        height:240px;
+      }
+
+      .content{
+        padding:20px;
+      }
+
+      .notice-title{
+        font-size:28px;
+      }
+
+      .notice-content{
+        font-size:16px;
+      }
+
+    }
+
   </style>
 </head>
 <body>
 
+  <!-- 상단 -->
+
   <div class="banner">
-    임시 웹사이트
+    ERICA 공지사항
   </div>
 
   <div class="container">
 
-    <!-- 공지 목록 -->
+    <!-- 좌측 공지 -->
+
     <div class="sidebar">
-      <div class="sidebar-title">공지 목록</div>
 
-      <div class="notice-item active" onclick="loadNotice(0, this)">
-        테스트 공지
+      <div class="sidebar-title">
+        공지 목록
       </div>
 
-      <div class="notice-item" onclick="loadNotice(1, this)">
-        업데이트 안내
-      </div>
     </div>
 
-    <!-- 내용 -->
+    <!-- 우측 내용 -->
+
     <div class="content">
 
       <div class="top-bar">
 
-        <!-- 번역기 -->
-        <div id="google_translate_element"></div>
+        <select id="languageSwitcher">
+
+          <option value="ko">한국어</option>
+          <option value="en">English</option>
+          <option value="ja">日本語</option>
+          <option value="zh-CN">中文</option>
+          <option value="es">Español</option>
+          <option value="fr">Français</option>
+          <option value="de">Deutsch</option>
+          <option value="ru">Русский</option>
+          <option value="ar">العربية</option>
+          <option value="vi">Tiếng Việt</option>
+          <option value="th">ไทย</option>
+          <option value="id">Bahasa Indonesia</option>
+
+        </select>
+
+        <!-- 숨겨진 구글 번역 -->
+
+        <div id="google_translate_element" style="display:none;"></div>
 
       </div>
 
       <div id="noticeArea">
+
         <div class="notice-title" id="noticeTitle"></div>
+
         <div class="notice-content" id="noticeContent"></div>
+
       </div>
 
     </div>
+
   </div>
 
   <script>
+
+    // =========================
     // 공지 데이터
+    // =========================
+
     const notices = [
+
+      // 메인 안내
+
       {
-        title: "테스트 공지",
+        title: "환영합니다",
         content: `
-          <p>자동 번역 테스트입니다.</p>
 
-          <img src="https://picsum.photos/800/300">
+          <h2>안녕하세요!</h2>
 
-          <table>
-            <tr>
-              <th>날짜</th>
-              <th>내용</th>
-            </tr>
-
-            <tr>
-              <td>2026-05-26</td>
-              <td>자동 번역 기능 추가</td>
-            </tr>
-
-            <tr>
-              <td>2026-05-27</td>
-              <td>HTML 표 기능 추가</td>
-            </tr>
-          </table>
+          <p>
+            이 사이트는 한양대학교 ERICA 유학생들을 위해 만들어졌습니다.
+          </p>
 
           <br>
 
-          <b>지원 기능</b>
+          <p>
+            공지를 정리하여 여러분의 모국어로
+            편리하게 볼 수 있도록 만든 사이트입니다.
+          </p>
+
+          <br>
+
+          <h3>사용 방법</h3>
 
           <ul>
-            <li>표 삽입</li>
-            <li>이미지 삽입</li>
-            <li>링크 삽입</li>
-            <li>자동 번역</li>
+            <li>왼쪽에서 원하는 공지를 선택하세요.</li>
+            <li>상단에서 원하는 언어를 선택하세요.</li>
+            <li>공지 내용이 자동 번역됩니다.</li>
           </ul>
 
           <br>
 
-          <a href="https://github.com" target="_blank">
-            GitHub 바로가기
-          </a>
+          <p>
+            즐거운 학교생활 되세요 :)
+          </p>
+
         `
       },
 
+      // TOPIK 공지
+
       {
-        title: "업데이트 안내",
+        title: "5/7 공지 - 여름학기 TOPIKⅡ 특별대비반",
         content: `
-          <p>업데이트 내역입니다.</p>
+
+          <h2>2026년 여름학기 TOPIKⅡ 특별대비반</h2>
 
           <table>
+
             <tr>
-              <th>버전</th>
-              <th>변경사항</th>
+              <th>신청 기간</th>
+              <td>2026.05.11.(월) ~ 2026.05.25.(일)</td>
             </tr>
 
             <tr>
-              <td>1.0</td>
-              <td>사이트 생성</td>
+              <th>강의 기간</th>
+              <td>2026.06.08.(월) ~ 2026.07.01.(수)</td>
             </tr>
 
             <tr>
-              <td>1.1</td>
-              <td>자동 번역 기능 추가</td>
+              <th>A CLASS</th>
+              <td>매주 월, 수 14:00 ~ 17:00</td>
             </tr>
+
+            <tr>
+              <th>B CLASS</th>
+              <td>매주 월, 수 18:00 ~ 21:00</td>
+            </tr>
+
+            <tr>
+              <th>수강료</th>
+              <td>140,000원</td>
+            </tr>
+
+            <tr>
+              <th>지원금</th>
+              <td>80,000원</td>
+            </tr>
+
           </table>
+
+          <h3>신청 자격</h3>
+
+          <ul>
+            <li>한양대학교 ERICA 재학 외국인 유학생</li>
+            <li>TOPIK 3급 이상 한국어 실력</li>
+            <li>휴학생 및 졸업예정자 신청 불가</li>
+          </ul>
+
+          <h3>신청 링크</h3>
+
+          <a href="https://docs.google.com/forms/d/e/1FAIpQLSf39LcRl2S9JglPLTxX3pS7cVCnszUxzmoTc5a6lH8Be0TfMQ/viewform"
+             target="_blank">
+            신청하러 가기
+          </a>
+
+        `
+      },
+
+      // 유튜브 공모전
+
+      {
+        title: "4/30 공지 - YouTube 공모전",
+        content: `
+
+          <h2>2026 외국인 유학생 YouTube 공모전</h2>
+
+          <table>
+
+            <tr>
+              <th>공모 주제</th>
+              <td>ERICA에서 이루는 나의 꿈</td>
+            </tr>
+
+            <tr>
+              <th>공모 기간</th>
+              <td>2026.05.04 ~ 2026.05.22</td>
+            </tr>
+
+            <tr>
+              <th>결과 발표</th>
+              <td>2026.06.15</td>
+            </tr>
+
+            <tr>
+              <th>형식</th>
+              <td>Vlog, 다큐멘터리, 웹드라마 등 자유 형식</td>
+            </tr>
+
+            <tr>
+              <th>분량</th>
+              <td>4분 이내</td>
+            </tr>
+
+          </table>
+
+          <h3>시상 내역</h3>
+
+          <ul>
+            <li>최우수상: 150만원</li>
+            <li>우수상: 100만원</li>
+            <li>장려상: 70만원</li>
+            <li>특별상: 50만원</li>
+          </ul>
+
+          <h3>참가 신청</h3>
+
+          <a href="https://form.naver.com/response/UIqyG5DFLepRl2MjOAsQGQ"
+             target="_blank">
+            참가 신청 링크
+          </a>
+
+        `
+      },
+
+      // 기숙사 공지
+
+      {
+        title: "4/30 공지 - 하계방학 기숙사 모집",
+        content: `
+
+          <h2>2026학년도 하계방학 기숙사 모집</h2>
+
+          <table>
+
+            <tr>
+              <th>신청 기간</th>
+              <td>2026.05.11.(월) 10:00 ~ 2026.05.20.(수) 23:59</td>
+            </tr>
+
+            <tr>
+              <th>합격 발표</th>
+              <td>2026.05.26.(화) 14:00</td>
+            </tr>
+
+            <tr>
+              <th>입사일</th>
+              <td>2026.06.24.(수) 10:00~</td>
+            </tr>
+
+            <tr>
+              <th>생활관</th>
+              <td>창의관 / 인재관 / 행복관</td>
+            </tr>
+
+          </table>
+
+          <h3>주의 사항</h3>
+
+          <ul>
+            <li>휴학생 신청 불가</li>
+            <li>벌점 10점 이상 신청 불가</li>
+            <li>입사 시 결핵검진 결과서 필요</li>
+            <li>중도퇴사 시 다음 학기 입사 제한</li>
+          </ul>
+
+          <h3>생활관 홈페이지</h3>
+
+          <a href="https://hydorm.hanyang.ac.kr"
+             target="_blank">
+            생활관 홈페이지 바로가기
+          </a>
+
         `
       }
+
     ];
 
-    let currentNoticeIndex = 0;
+    // =========================
+    // 사이드바 생성
+    // =========================
 
+    const sidebar = document.querySelector(".sidebar");
+
+    notices.forEach((notice, index) => {
+
+      const item = document.createElement("div");
+
+      item.className = "notice-item";
+
+      if(index === 0){
+        item.classList.add("active");
+      }
+
+      item.innerText = notice.title;
+
+      item.onclick = () => {
+
+        document.querySelectorAll(".notice-item")
+          .forEach(el => el.classList.remove("active"));
+
+        item.classList.add("active");
+
+        loadNotice(index);
+
+      };
+
+      sidebar.appendChild(item);
+
+    });
+
+    // =========================
     // 공지 로딩
-    function loadNotice(index, element) {
-      currentNoticeIndex = index;
+    // =========================
 
-      document.querySelectorAll(".notice-item").forEach(item => {
-        item.classList.remove("active");
-      });
-
-      element.classList.add("active");
+    function loadNotice(index){
 
       const notice = notices[index];
 
@@ -280,25 +556,52 @@
 
       document.getElementById("noticeContent").innerHTML =
         notice.content;
+
     }
 
-    // 첫 로딩
-    loadNotice(
-      0,
-      document.querySelector(".notice-item")
-    );
+    // 첫 페이지 로딩
 
+    loadNotice(0);
+
+    // =========================
     // 구글 번역
-    function googleTranslateElementInit() {
+    // =========================
+
+    function googleTranslateElementInit(){
+
       new google.translate.TranslateElement({
-        pageLanguage: 'ko',
-        includedLanguages: 'en,ja,zh-CN,ko',
-        layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+
+        pageLanguage:'ko'
+
       }, 'google_translate_element');
+
     }
+
+    // 언어 변경
+
+    document.getElementById("languageSwitcher")
+      .addEventListener("change", function () {
+
+        const lang = this.value;
+
+        const select = document.querySelector(".goog-te-combo");
+
+        if(select){
+
+          select.value = lang;
+
+          select.dispatchEvent(
+            new Event("change")
+          );
+
+        }
+
+    });
+
   </script>
 
-  <!-- 구글 번역 API -->
+  <!-- 구글 번역 -->
+
   <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 </body>
