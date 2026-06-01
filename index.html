@@ -85,6 +85,7 @@
     .content{
       flex:1;
       padding:30px;
+      padding-right:240px;
       overflow-y:auto;
       background:#f9fafb;
     }
@@ -231,7 +232,34 @@
       }
 
     }
-
+    .international-banner{
+      position:fixed;
+      right:20px;
+      top:50%;
+      transform:translateY(-50%);
+      width:180px;
+      z-index:9999;
+      display:block;
+    }
+    .international-banner img{
+      width:100%;
+      height:auto;
+      display:block;
+      border-radius:12px;
+      opacity:0.95;
+      transition:all .3s ease;
+    }
+    .international-banner img:hover{
+      opacity:1;
+      transform:scale(1.05);
+    }
+    @media(max-width:1200px){
+      
+      .international-banner{
+        display:none;
+      }
+    
+    }
   </style>
 </head>
 <body>
@@ -603,6 +631,16 @@
   <!-- 구글 번역 -->
 
   <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<a
+  href="https://global.hanyang.ac.kr/s3/s3_1.php"
+  target="_blank"
+  class="international-banner"
+>
+  <img
+    src="international-banner.png"
+    alt="International Office"
+  >
+</a>
 
 </body>
 </html>
