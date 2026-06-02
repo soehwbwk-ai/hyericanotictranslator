@@ -44,17 +44,16 @@ body {
   width: 100%;
   margin-top: 20px;
   border-radius: 8px;
-  cursor: pointer;
 }
 
-/* 중앙 (상세 + 인트로) */
+/* 중앙 (상세) */
 .center {
   flex: 1;
   padding: 15px;
   overflow-y: auto;
 }
 
-/* 우측 (리스트 + 글쓰기) */
+/* 우측 (리스트) */
 .right {
   width: 320px;
   border-left: 1px solid #ddd;
@@ -155,12 +154,12 @@ body {
     </a>
   </div>
 
-  <!-- CENTER (상세 + 인트로) -->
+  <!-- CENTER (상세) -->
   <div class="center">
     <div id="detailBox"></div>
   </div>
 
-  <!-- RIGHT (리스트 + 글쓰기) -->
+  <!-- RIGHT (리스트) -->
   <div class="right">
     <button onclick="createPost()">글쓰기</button>
     <div id="list"></div>
@@ -168,13 +167,11 @@ body {
 
 </div>
 
-<!-- 글쓰기 모달 -->
+<!-- 모달 -->
 <div id="writeModal" class="modal">
   <div class="modal-content">
     <h2>글쓰기</h2>
-    <input id="writeTitle" placeholder="제목" />
     <textarea id="writeContent" placeholder="내용"></textarea>
-
     <button onclick="submitPost()">등록</button>
     <button onclick="closeModal()">닫기</button>
   </div>
@@ -195,13 +192,12 @@ import {
 
 /* Firebase */
 const firebaseConfig = {
-  apiKey: "AIzaSyCcvEq1CdRVl35RdTxnMmqvxvP7W6fwYp8",
-  authDomain: "hyericanotictranslator.firebaseapp.com",
-  projectId: "hyericanotictranslator",
-  storageBucket: "hyericanotictranslator.firebasestorage.app",
-  messagingSenderId: "520674515470",
-  appId: "1:520674515470:web:b00c1309a18410cc64ba5f",
-  measurementId: "G-9MSK18NM6Y"
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_BUCKET",
+  messagingSenderId: "YOUR_ID",
+  appId: "YOUR_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -219,11 +215,10 @@ window.closeModal = () => {
 };
 
 window.submitPost = async () => {
-  const title = document.getElementById("writeTitle").value;
   const content = document.getElementById("writeContent").value;
 
   await addDoc(collection(db, currentCollection), {
-    title,
+    title: "제목 없음",
     content,
     createdAt: serverTimestamp()
   });
@@ -254,12 +249,12 @@ function listen() {
 
       const div = document.createElement("div");
       div.className = "item";
-      div.innerText = d.title;
+      div.innerText = d.title || "제목 없음";
 
       div.onclick = () => {
         document.getElementById("detailBox").innerHTML = `
           <h2>${d.title}</h2>
-          <p>${d.content}</p>
+          <p>${formatText(d.content)}</p>
         `;
       };
 
@@ -268,13 +263,22 @@ function listen() {
   });
 }
 
+/* 🔥 줄바꿈 + 기본 서식 */
+function formatText(text) {
+  if (!text) return "";
+
+  return text
+    .replace(/\n/g, "<br>")
+    .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
+}
+
 /* 첫 화면 */
 function showIntro() {
   document.getElementById("detailBox").innerHTML = `
     <h2>📌 환영합니다</h2>
     <p>
       안녕하세요. 이 사이트는 한양대학교 ERICA 유학생들이
-      공지와 행사 정보를 쉽게 확인할 수 있도록 만든 플랫폼입니다.
+      공지와 이벤트 정보를 쉽게 확인할 수 있도록 만든 플랫폼입니다.
     </p>
   `;
 }
