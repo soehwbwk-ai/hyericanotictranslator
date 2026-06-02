@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8" />
-<title>ERICA 유학생 게시판</title>
+<title>ERICA 유학생 플랫폼</title>
 
 <style>
 body {
@@ -20,13 +20,13 @@ body {
   font-weight: bold;
 }
 
-/* 전체 */
+/* 전체 레이아웃 */
 .container {
   display: flex;
   height: calc(100vh - 60px);
 }
 
-/* 왼쪽 */
+/* 좌측 */
 .sidebar {
   width: 200px;
   border-right: 1px solid #ddd;
@@ -43,8 +43,8 @@ body {
 .sidebar-banner {
   width: 100%;
   margin-top: 20px;
-  cursor: pointer;
   border-radius: 8px;
+  cursor: pointer;
 }
 
 /* 중앙 */
@@ -61,7 +61,7 @@ body {
   cursor: pointer;
 }
 
-/* 오른쪽 */
+/* 우측 */
 .detail {
   width: 320px;
   border-left: 1px solid #ddd;
@@ -73,10 +73,7 @@ body {
 .modal {
   display: none;
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background: rgba(0,0,0,0.5);
   justify-content: center;
   align-items: center;
@@ -100,6 +97,24 @@ body {
   height: 200px;
   resize: none;
 }
+
+/* 번역 UI */
+.lang-box {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 99999;
+}
+
+.lang-btn {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.lang-select {
+  display: none;
+  margin-top: 5px;
+}
 </style>
 
 </head>
@@ -108,15 +123,35 @@ body {
 
 <div class="top-banner">ERICA 공지사항</div>
 
+<!-- 🌐 번역 UI -->
+<div class="lang-box">
+  <button class="lang-btn" onclick="toggleLang()">🌐 번역</button>
+
+  <select id="langSelect" class="lang-select" onchange="translatePage()">
+    <option value="">언어 선택</option>
+    <option value="ko">한국어</option>
+    <option value="en">English</option>
+    <option value="ja">日本語</option>
+    <option value="zh-CN">中文(简体)</option>
+    <option value="zh-TW">中文(繁體)</option>
+    <option value="es">Español</option>
+    <option value="fr">Français</option>
+    <option value="de">Deutsch</option>
+    <option value="ru">Русский</option>
+    <option value="vi">Tiếng Việt</option>
+    <option value="th">ไทย</option>
+    <option value="id">Bahasa Indonesia</option>
+  </select>
+</div>
+
 <div class="container">
 
   <!-- LEFT -->
   <div class="sidebar">
     <button onclick="loadNotices()">공지사항</button>
     <button onclick="loadGroups()">모임게시판</button>
-    <button onclick="alert('준비중입니다')">유학생 지원 프로그램</button>
+    <button onclick="alert('준비중')">유학생 지원 프로그램</button>
 
-    <!-- 배너 -->
     <a href="https://global.hanyang.ac.kr/?intro_non" target="_blank">
       <img src="international-banner.png" class="sidebar-banner">
     </a>
@@ -130,7 +165,7 @@ body {
 
   <!-- RIGHT -->
   <div class="detail">
-    <h3>상세 보기</h3>
+    <h3>게시글</h3>
     <div id="detailBox"></div>
   </div>
 
@@ -161,15 +196,14 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
-/* 🔥 Firebase 설정 (여기만 수정) */
+/* 🔥 Firebase */
 const firebaseConfig = {
-  apiKey: "AIzaSyCcvEq1CdRVl35RdTxnMmqvxvP7W6fwYp8",
-  authDomain: "hyericanotictranslator.firebaseapp.com",
-  projectId: "hyericanotictranslator",
-  storageBucket: "hyericanotictranslator.firebasestorage.app",
-  messagingSenderId: "520674515470",
-  appId: "1:520674515470:web:b00c1309a18410cc64ba5f",
-  measurementId: "G-9MSK18NM6Y"
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_BUCKET",
+  messagingSenderId: "YOUR_ID",
+  appId: "YOUR_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -177,17 +211,15 @@ const db = getFirestore(app);
 
 let currentCollection = "notices";
 
-/* 글쓰기 열기 */
+/* 글쓰기 */
 window.createPost = () => {
   document.getElementById("writeModal").style.display = "flex";
 };
 
-/* 닫기 */
 window.closeModal = () => {
   document.getElementById("writeModal").style.display = "none";
 };
 
-/* 글 등록 */
 window.submitPost = async () => {
   const title = document.getElementById("writeTitle").value;
   const content = document.getElementById("writeContent").value;
@@ -200,25 +232,20 @@ window.submitPost = async () => {
     createdAt: serverTimestamp()
   });
 
-  document.getElementById("writeTitle").value = "";
-  document.getElementById("writeContent").value = "";
-
   closeModal();
 };
 
-/* 공지 */
+/* 게시판 */
 window.loadNotices = () => {
   currentCollection = "notices";
   listen();
 };
 
-/* 모임 */
 window.loadGroups = () => {
   currentCollection = "groups";
   listen();
 };
 
-/* 리스트 */
 function listen() {
   const q = query(
     collection(db, currentCollection),
@@ -248,16 +275,13 @@ function listen() {
   });
 }
 
-/* 첫 화면 안내 */
+/* 첫 화면 */
 function showIntro() {
   document.getElementById("detailBox").innerHTML = `
     <h2>📌 환영합니다</h2>
     <p>
-      안녕하세요. 이 사이트는 한양대학교 ERICA에 재학 중인 유학생들이
-      교내 공지와 행사 정보를 보다 쉽게 확인하고 이해할 수 있도록 만든 게시판입니다.
-    </p>
-    <p>
-      더 많은 유학생 지원 프로그램은 한양대학교 국제처 공식 사이트를 참고해 주세요.
+      안녕하세요. 이 사이트는 한양대학교 ERICA 유학생들이
+      공지와 이벤트 정보를 쉽게 확인하고 이해할 수 있도록 만든 플랫폼입니다.
     </p>
   `;
 }
@@ -265,6 +289,33 @@ function showIntro() {
 /* 초기 실행 */
 loadNotices();
 showIntro();
+
+/* 🌐 번역 기능 */
+window.toggleLang = () => {
+  const sel = document.getElementById("langSelect");
+  sel.style.display = sel.style.display === "block" ? "none" : "block";
+};
+
+async function translateText(text, lang) {
+  const res = await fetch(
+    `https://translate.googleapis.com/translate_a/single?client=gtx&sl=ko&tl=${lang}&dt=t&q=${encodeURIComponent(text)}`
+  );
+  const data = await res.json();
+  return data[0][0][0];
+}
+
+window.translatePage = async () => {
+  const lang = document.getElementById("langSelect").value;
+  if (!lang) return;
+
+  const els = document.querySelectorAll("h2,p,button,div.item");
+
+  for (let el of els) {
+    if (!el.dataset.origin) el.dataset.origin = el.innerText;
+
+    el.innerText = await translateText(el.dataset.origin, lang);
+  }
+};
 
 </script>
 
