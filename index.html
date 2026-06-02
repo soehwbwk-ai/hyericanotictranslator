@@ -1,39 +1,112 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>공지 + 게시판</title>
-  <style>
-    body { font-family: Arial; margin: 20px; }
-    input, textarea { width: 100%; margin: 5px 0; padding: 8px; }
-    button { padding: 8px 12px; margin-bottom: 20px; }
-    .box { border: 1px solid #ddd; padding: 10px; margin-bottom: 20px; }
-  </style>
+<meta charset="UTF-8" />
+<title>ERICA 유학생 게시판</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+}
+
+/* 상단 */
+.top-banner {
+  background: #1e3a8a;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* 전체 */
+.container {
+  display: flex;
+  height: calc(100vh - 60px);
+}
+
+/* 왼쪽 */
+.sidebar {
+  width: 200px;
+  border-right: 1px solid #ddd;
+  padding: 10px;
+}
+
+.sidebar button {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+/* 중앙 */
+.center {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.item {
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+/* 오른쪽 */
+.detail {
+  width: 320px;
+  border-left: 1px solid #ddd;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+/* 배너 */
+.side-banner {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 120px;
+  z-index: 9999;
+  cursor: pointer;
+}
+</style>
+
 </head>
 
 <body>
 
-<h1>📢 공지사항 (관리자 전용)</h1>
+<div class="top-banner">ERICA 공지사항</div>
 
-<div class="box">
-  <input id="noticeTitle" placeholder="공지 제목" />
-  <textarea id="noticeContent" placeholder="공지 내용"></textarea>
-  <button onclick="createNotice()">공지 작성</button>
+<div class="container">
+
+  <!-- LEFT -->
+  <div class="sidebar">
+    <button onclick="loadNotices()">공지사항</button>
+    <button onclick="loadGroups()">모임게시판</button>
+    <button onclick="alert('준비중입니다')">유학생 지원 프로그램</button>
+  </div>
+
+  <!-- CENTER -->
+  <div class="center">
+    <button onclick="createPost()">글쓰기</button>
+    <div id="list"></div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="detail">
+    <h3>상세 보기</h3>
+    <div id="detailBox"></div>
+  </div>
+
 </div>
 
-<div id="noticeList"></div>
-
-<hr>
-
-<h1>💬 자유 게시판 (누구나)</h1>
-
-<div class="box">
-  <input id="groupTitle" placeholder="글 제목" />
-  <textarea id="groupContent" placeholder="내용"></textarea>
-  <button onclick="createGroup()">글 작성</button>
-</div>
-
-<div id="groupList"></div>
+<!-- 오른쪽 배너 -->
+<a href="https://global.hanyang.ac.kr/?intro_non" target="_blank">
+  <img src="international-banner.png" class="side-banner">
+</a>
 
 <script type="module">
 
@@ -48,97 +121,97 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
+/* 🔥 Firebase 설정 (너 걸로 교체) */
 const firebaseConfig = {
-  apiKey: "AIzaSyCcvEq1CdRVl35RdTxnMmqvxvP7W6fwYp8",
-  authDomain: "hyericanotictranslator.firebaseapp.com",
-  projectId: "hyericanotictranslator",
-  storageBucket: "hyericanotictranslator.firebasestorage.app",
-  messagingSenderId: "520674515470",
-  appId: "1:520674515470:web:b00c1309a18410cc64ba5f",
-  measurementId: "G-9MSK18NM6Y"
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_BUCKET",
+  messagingSenderId: "YOUR_ID",
+  appId: "YOUR_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// 3. 관리자 이메일 (간단 버전)
-const ADMIN_EMAIL = "admin@example.com";
-let currentUserEmail = "admin@example.com"; // 테스트용 (나중에 로그인 붙이면 바뀜)
+let currentCollection = "notices";
 
+/* 글쓰기 */
+window.createPost = async () => {
+  const title = prompt("제목");
+  const content = prompt("내용");
 
-// 4. 공지 작성 (관리자만)
-window.createNotice = async () => {
-  if (currentUserEmail !== ADMIN_EMAIL) {
-    alert("관리자만 공지 작성 가능");
-    return;
-  }
+  if (!title || !content) return;
 
-  await addDoc(collection(db, "notices"), {
-    title: document.getElementById("noticeTitle").value,
-    content: document.getElementById("noticeContent").value,
+  await addDoc(collection(db, currentCollection), {
+    title,
+    content,
     createdAt: serverTimestamp()
   });
-
-  alert("공지 등록 완료");
 };
 
-
-// 5. 자유게시판 글 작성 (누구나)
-window.createGroup = async () => {
-  await addDoc(collection(db, "groups"), {
-    title: document.getElementById("groupTitle").value,
-    content: document.getElementById("groupContent").value,
-    createdAt: serverTimestamp()
-  });
-
-  alert("글 등록 완료");
+/* 공지 */
+window.loadNotices = () => {
+  currentCollection = "notices";
+  listen();
 };
 
+/* 모임 */
+window.loadGroups = () => {
+  currentCollection = "groups";
+  listen();
+};
 
-// 6. 공지 실시간 출력
-const noticeQuery = query(
-  collection(db, "notices"),
-  orderBy("createdAt", "desc")
-);
+/* 리스트 */
+function listen() {
+  const q = query(
+    collection(db, currentCollection),
+    orderBy("createdAt", "desc")
+  );
 
-onSnapshot(noticeQuery, (snapshot) => {
-  const box = document.getElementById("noticeList");
-  box.innerHTML = "";
+  onSnapshot(q, (snapshot) => {
+    const list = document.getElementById("list");
+    list.innerHTML = "";
 
-  snapshot.forEach((doc) => {
-    const d = doc.data();
-    box.innerHTML += `
-      <div class="box">
-        <h3>📌 ${d.title}</h3>
-        <p>${d.content}</p>
-      </div>
-    `;
+    snapshot.forEach(doc => {
+      const data = doc.data();
+
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerText = data.title;
+
+      div.onclick = () => {
+        document.getElementById("detailBox").innerHTML = `
+          <h2>${data.title}</h2>
+          <p>${data.content}</p>
+        `;
+      };
+
+      list.appendChild(div);
+    });
   });
-});
+}
 
+/* 첫 화면 안내 */
+function showIntro() {
+  document.getElementById("detailBox").innerHTML = `
+    <h2>📌 환영합니다</h2>
+    <p>
+      안녕하세요. 이 사이트는 한양대학교 ERICA에 재학 중인 유학생들이
+      교내 공지와 행사 정보를 보다 쉽게 확인하고 이해할 수 있도록 만든 게시판입니다.
+    </p>
+    <p>
+      더 많은 유학생 지원 프로그램은 한양대학교 국제처 공식 사이트를 참고해 주세요.
+    </p>
+  `;
+}
 
-// 7. 자유게시판 실시간 출력
-const groupQuery = query(
-  collection(db, "groups"),
-  orderBy("createdAt", "desc")
-);
-
-onSnapshot(groupQuery, (snapshot) => {
-  const box = document.getElementById("groupList");
-  box.innerHTML = "";
-
-  snapshot.forEach((doc) => {
-    const d = doc.data();
-    box.innerHTML += `
-      <div class="box">
-        <h3>${d.title}</h3>
-        <p>${d.content}</p>
-      </div>
-    `;
-  });
-});
+/* 초기 실행 */
+loadNotices();
+showIntro();
 
 </script>
 
 </body>
+</html>
 </html>
