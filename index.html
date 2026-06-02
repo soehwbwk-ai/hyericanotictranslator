@@ -10,7 +10,6 @@ body {
   font-family: Arial;
 }
 
-/* 상단 */
 .top-banner {
   background: #1e3a8a;
   color: white;
@@ -20,13 +19,12 @@ body {
   font-weight: bold;
 }
 
-/* 전체 */
 .container {
   display: flex;
   height: calc(100vh - 60px);
 }
 
-/* 좌측 */
+/* LEFT */
 .sidebar {
   width: 200px;
   border-right: 1px solid #ddd;
@@ -46,14 +44,14 @@ body {
   border-radius: 8px;
 }
 
-/* 중앙 (상세) */
+/* CENTER (DETAIL) */
 .center {
   flex: 1;
   padding: 15px;
   overflow-y: auto;
 }
 
-/* 우측 (리스트) */
+/* RIGHT (LIST) */
 .right {
   width: 320px;
   border-left: 1px solid #ddd;
@@ -68,7 +66,7 @@ body {
   cursor: pointer;
 }
 
-/* 모달 */
+/* MODAL */
 .modal {
   display: none;
   position: fixed;
@@ -97,7 +95,7 @@ body {
   resize: none;
 }
 
-/* 번역 */
+/* LANGUAGE */
 .lang-box {
   position: fixed;
   top: 10px;
@@ -122,7 +120,7 @@ body {
 
 <div class="top-banner">ERICA 공지사항</div>
 
-<!-- 번역 -->
+<!-- LANGUAGE -->
 <div class="lang-box">
   <button class="lang-btn" onclick="toggleLang()">🌐 번역</button>
   <select id="langSelect" class="lang-select" onchange="translatePage()">
@@ -147,19 +145,19 @@ body {
   <div class="sidebar">
     <button onclick="loadNotices()">공지사항</button>
     <button onclick="loadGroups()">모임게시판</button>
-    <button onclick="alert('준비중')">유학생 지원 프로그램</button>
+    <button onclick="loadProgram()">유학생 지원 프로그램</button>
 
     <a href="https://global.hanyang.ac.kr/?intro_non" target="_blank">
       <img src="international-banner.png" class="sidebar-banner">
     </a>
   </div>
 
-  <!-- CENTER (상세) -->
+  <!-- CENTER (DETAIL VIEW) -->
   <div class="center">
     <div id="detailBox"></div>
   </div>
 
-  <!-- RIGHT (리스트) -->
+  <!-- RIGHT (LIST + WRITE) -->
   <div class="right">
     <button onclick="createPost()">글쓰기</button>
     <div id="list"></div>
@@ -167,12 +165,16 @@ body {
 
 </div>
 
-<!-- 모달 -->
+<!-- MODAL -->
 <div id="writeModal" class="modal">
   <div class="modal-content">
     <h2>글쓰기</h2>
+
     <input id="writeTitle" placeholder="제목" />
     <textarea id="writeContent" placeholder="내용"></textarea>
+
+    <input type="file" id="imageFile" accept="image/*" />
+
     <button onclick="submitPost()">등록</button>
     <button onclick="closeModal()">닫기</button>
   </div>
@@ -191,7 +193,14 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
-/* Firebase */
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
+
+/* FIREBASE CONFIG */
 const firebaseConfig = {
   apiKey: "AIzaSyCcvEq1CdRVl35RdTxnMmqvxvP7W6fwYp8",
   authDomain: "hyericanotictranslator.firebaseapp.com",
@@ -204,10 +213,11 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 let currentCollection = "notices";
 
-/* 글쓰기 */
+/* WRITE MODAL */
 window.createPost = () => {
   document.getElementById("writeModal").style.display = "flex";
 };
@@ -216,20 +226,31 @@ window.closeModal = () => {
   document.getElementById("writeModal").style.display = "none";
 };
 
+/* SUBMIT POST */
 window.submitPost = async () => {
   const title = document.getElementById("writeTitle").value;
   const content = document.getElementById("writeContent").value;
-  if (!title || !content) return;
+  const file = document.getElementById("imageFile").files[0];
+
+  let imageUrl = "";
+
+  if (file) {
+    const storageRef = ref(storage, `images/${Date.now()}_${file.name}`);
+    await uploadBytes(storageRef, file);
+    imageUrl = await getDownloadURL(storageRef);
+  }
+
   await addDoc(collection(db, currentCollection), {
     title,
     content,
+    imageUrl,
     createdAt: serverTimestamp()
   });
 
   closeModal();
 };
 
-/* 리스트 */
+/* COLLECTION SWITCH */
 window.loadNotices = () => {
   currentCollection = "notices";
   listen();
@@ -240,6 +261,12 @@ window.loadGroups = () => {
   listen();
 };
 
+window.loadProgram = () => {
+  currentCollection = "program";
+  listen();
+};
+
+/* LISTENER */
 function listen() {
   const q = query(collection(db, currentCollection), orderBy("createdAt", "desc"));
 
@@ -252,12 +279,13 @@ function listen() {
 
       const div = document.createElement("div");
       div.className = "item";
-      div.innerText = d.title || "제목 없음";
+      div.innerText = d.title;
 
       div.onclick = () => {
         document.getElementById("detailBox").innerHTML = `
           <h2>${d.title}</h2>
           <p>${formatText(d.content)}</p>
+          ${d.imageUrl ? `<img src="${d.imageUrl}" style="max-width:100%; margin-top:10px;">` : ""}
         `;
       };
 
@@ -266,31 +294,30 @@ function listen() {
   });
 }
 
-/* 🔥 줄바꿈 + 기본 서식 */
+/* FORMAT (줄바꿈 + bold) */
 function formatText(text) {
   if (!text) return "";
-
   return text
     .replace(/\n/g, "<br>")
     .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
 }
 
-/* 첫 화면 */
+/* INTRO */
 function showIntro() {
   document.getElementById("detailBox").innerHTML = `
     <h2>📌 환영합니다</h2>
     <p>
-      안녕하세요. 이 사이트는 한양대학교 ERICA 유학생들이
-      공지와 이벤트 정보를 쉽게 확인할 수 있도록 만든 플랫폼입니다.
+      이 사이트는 한양대학교 ERICA 유학생들이 공지와 이벤트,
+      지원 프로그램을 쉽게 확인할 수 있도록 만든 플랫폼입니다.
     </p>
   `;
 }
 
-/* 초기 */
+/* INIT */
 loadNotices();
 showIntro();
 
-/* 번역 */
+/* LANGUAGE */
 window.toggleLang = () => {
   const sel = document.getElementById("langSelect");
   sel.style.display = sel.style.display === "block" ? "none" : "block";
