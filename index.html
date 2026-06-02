@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>공지 + 게시판</title>
+  <style>
+    body { font-family: Arial; margin: 20px; }
+    input, textarea { width: 100%; margin: 5px 0; padding: 8px; }
+    button { padding: 8px 12px; margin-bottom: 20px; }
+    .box { border: 1px solid #ddd; padding: 10px; margin-bottom: 20px; }
+  </style>
+</head>
+
+<body>
+
+<h1>📢 공지사항 (관리자 전용)</h1>
+
+<div class="box">
+  <input id="noticeTitle" placeholder="공지 제목" />
+  <textarea id="noticeContent" placeholder="공지 내용"></textarea>
+  <button onclick="createNotice()">공지 작성</button>
+</div>
+
+<div id="noticeList"></div>
+
+<hr>
+
+<h1>💬 자유 게시판 (누구나)</h1>
+
+<div class="box">
+  <input id="groupTitle" placeholder="글 제목" />
+  <textarea id="groupContent" placeholder="내용"></textarea>
+  <button onclick="createGroup()">글 작성</button>
+</div>
+
+<div id="groupList"></div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  onSnapshot,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCcvEq1CdRVl35RdTxnMmqvxvP7W6fwYp8",
+  authDomain: "hyericanotictranslator.firebaseapp.com",
+  projectId: "hyericanotictranslator",
+  storageBucket: "hyericanotictranslator.firebasestorage.app",
+  messagingSenderId: "520674515470",
+  appId: "1:520674515470:web:b00c1309a18410cc64ba5f",
+  measurementId: "G-9MSK18NM6Y"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// 3. 관리자 이메일 (간단 버전)
+const ADMIN_EMAIL = "admin@example.com";
+let currentUserEmail = "admin@example.com"; // 테스트용 (나중에 로그인 붙이면 바뀜)
+
+
+// 4. 공지 작성 (관리자만)
+window.createNotice = async () => {
+  if (currentUserEmail !== ADMIN_EMAIL) {
+    alert("관리자만 공지 작성 가능");
+    return;
+  }
+
+  await addDoc(collection(db, "notices"), {
+    title: document.getElementById("noticeTitle").value,
+    content: document.getElementById("noticeContent").value,
+    createdAt: serverTimestamp()
+  });
+
+  alert("공지 등록 완료");
+};
+
+
+// 5. 자유게시판 글 작성 (누구나)
+window.createGroup = async () => {
+  await addDoc(collection(db, "groups"), {
+    title: document.getElementById("groupTitle").value,
+    content: document.getElementById("groupContent").value,
+    createdAt: serverTimestamp()
+  });
+
+  alert("글 등록 완료");
+};
+
+
+// 6. 공지 실시간 출력
+const noticeQuery = query(
+  collection(db, "notices"),
+  orderBy("createdAt", "desc")
+);
+
+onSnapshot(noticeQuery, (snapshot) => {
+  const box = document.getElementById("noticeList");
+  box.innerHTML = "";
+
+  snapshot.forEach((doc) => {
+    const d = doc.data();
+    box.innerHTML += `
+      <div class="box">
+        <h3>📌 ${d.title}</h3>
+        <p>${d.content}</p>
+      </div>
+    `;
+  });
+});
+
+
+// 7. 자유게시판 실시간 출력
+const groupQuery = query(
+  collection(db, "groups"),
+  orderBy("createdAt", "desc")
+);
+
+onSnapshot(groupQuery, (snapshot) => {
+  const box = document.getElementById("groupList");
+  box.innerHTML = "";
+
+  snapshot.forEach((doc) => {
+    const d = doc.data();
+    box.innerHTML += `
+      <div class="box">
+        <h3>${d.title}</h3>
+        <p>${d.content}</p>
+      </div>
+    `;
+  });
+});
+
+</script>
+
+</body>
+</html>
