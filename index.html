@@ -9,12 +9,7 @@ body {
   margin: 0;
   font-family: Arial;
 }
-.sidebar-banner {
-  width: 100%;
-  margin-top: 20px;
-  cursor: pointer;
-  border-radius: 8px;
-}
+
 /* 상단 */
 .top-banner {
   background: #1e3a8a;
@@ -45,6 +40,13 @@ body {
   cursor: pointer;
 }
 
+.sidebar-banner {
+  width: 100%;
+  margin-top: 20px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
 /* 중앙 */
 .center {
   flex: 1;
@@ -67,15 +69,36 @@ body {
   overflow-y: auto;
 }
 
-/* 배너 */
-.side-banner {
+/* 모달 */
+.modal {
+  display: none;
   position: fixed;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 120px;
-  z-index: 9999;
-  cursor: pointer;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: white;
+  width: 500px;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.modal-content input,
+.modal-content textarea {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 10px;
+}
+
+.modal-content textarea {
+  height: 200px;
+  resize: none;
 }
 </style>
 
@@ -92,6 +115,8 @@ body {
     <button onclick="loadNotices()">공지사항</button>
     <button onclick="loadGroups()">모임게시판</button>
     <button onclick="alert('준비중입니다')">유학생 지원 프로그램</button>
+
+    <!-- 배너 -->
     <a href="https://global.hanyang.ac.kr/?intro_non" target="_blank">
       <img src="international-banner.png" class="sidebar-banner">
     </a>
@@ -111,6 +136,17 @@ body {
 
 </div>
 
+<!-- 글쓰기 모달 -->
+<div id="writeModal" class="modal">
+  <div class="modal-content">
+    <h2>글쓰기</h2>
+    <input id="writeTitle" placeholder="제목" />
+    <textarea id="writeContent" placeholder="내용"></textarea>
+
+    <button onclick="submitPost()">등록</button>
+    <button onclick="closeModal()">닫기</button>
+  </div>
+</div>
 
 <script type="module">
 
@@ -125,14 +161,15 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
-/* 🔥 Firebase 설정 (너 걸로 교체) */
+/* 🔥 Firebase 설정 (여기만 수정) */
 const firebaseConfig = {
-  apiKey: "YOUR_KEY",
-  authDomain: "YOUR_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_BUCKET",
-  messagingSenderId: "YOUR_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyCcvEq1CdRVl35RdTxnMmqvxvP7W6fwYp8",
+  authDomain: "hyericanotictranslator.firebaseapp.com",
+  projectId: "hyericanotictranslator",
+  storageBucket: "hyericanotictranslator.firebasestorage.app",
+  messagingSenderId: "520674515470",
+  appId: "1:520674515470:web:b00c1309a18410cc64ba5f",
+  measurementId: "G-9MSK18NM6Y"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -140,10 +177,20 @@ const db = getFirestore(app);
 
 let currentCollection = "notices";
 
-/* 글쓰기 */
-window.createPost = async () => {
-  const title = prompt("제목");
-  const content = prompt("내용");
+/* 글쓰기 열기 */
+window.createPost = () => {
+  document.getElementById("writeModal").style.display = "flex";
+};
+
+/* 닫기 */
+window.closeModal = () => {
+  document.getElementById("writeModal").style.display = "none";
+};
+
+/* 글 등록 */
+window.submitPost = async () => {
+  const title = document.getElementById("writeTitle").value;
+  const content = document.getElementById("writeContent").value;
 
   if (!title || !content) return;
 
@@ -152,6 +199,11 @@ window.createPost = async () => {
     content,
     createdAt: serverTimestamp()
   });
+
+  document.getElementById("writeTitle").value = "";
+  document.getElementById("writeContent").value = "";
+
+  closeModal();
 };
 
 /* 공지 */
@@ -217,5 +269,4 @@ showIntro();
 </script>
 
 </body>
-</html>
 </html>
