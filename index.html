@@ -81,6 +81,9 @@ body {
   width: 500px;
   padding: 20px;
   border-radius: 10px;
+
+  max-height: 80vh;  
+  overflow-y: auto; 
 }
 
 .modal-content input,
@@ -93,6 +96,14 @@ body {
 .modal-content textarea {
   height: 200px;
   resize: none;
+}
+  input, textarea {
+  font-size: 14px;
+}
+
+input[type="file"] {
+  display: block;
+  margin-top: 10px;
 }
 
 /* LANGUAGE */
@@ -172,7 +183,7 @@ body {
 
     <input id="writeTitle" placeholder="제목" />
     <textarea id="writeContent" placeholder="내용"></textarea>
-
+    <label>사진 첨부</label>
     <input type="file" id="imageFile" accept="image/*" />
 
     <button onclick="submitPost()">등록</button>
