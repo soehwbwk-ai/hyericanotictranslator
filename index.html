@@ -9,7 +9,12 @@ body {
   margin: 0;
   font-family: Arial;
 }
-
+.sidebar-banner {
+  width: 100%;
+  margin-top: 20px;
+  cursor: pointer;
+  border-radius: 8px;
+}
 /* 상단 */
 .top-banner {
   background: #1e3a8a;
@@ -87,6 +92,9 @@ body {
     <button onclick="loadNotices()">공지사항</button>
     <button onclick="loadGroups()">모임게시판</button>
     <button onclick="alert('준비중입니다')">유학생 지원 프로그램</button>
+    <a href="https://global.hanyang.ac.kr/?intro_non" target="_blank">
+      <img src="international-banner.png" class="sidebar-banner">
+    </a>
   </div>
 
   <!-- CENTER -->
@@ -103,10 +111,6 @@ body {
 
 </div>
 
-<!-- 오른쪽 배너 -->
-<a href="https://global.hanyang.ac.kr/?intro_non" target="_blank">
-  <img src="international-banner.png" class="side-banner">
-</a>
 
 <script type="module">
 
